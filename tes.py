@@ -13,7 +13,7 @@ def connect_to_db():
             port="5432",
             database="basdawo",
             user="postgres",
-            password="Kholish8306!"
+            password="" # your password here
         )
         cur = conn.cursor()
         return conn, cur
