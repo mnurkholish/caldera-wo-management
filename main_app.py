@@ -19,7 +19,7 @@ def connect_to_db():
             port="5432",
             database="basdawo",
             user="postgres",
-            password="Kholish8306!"
+            password=input("Masukkan password database: ").strip()
         )
         cur = conn.cursor()
         return conn, cur
@@ -140,6 +140,29 @@ def register():
         finally:
             cur.close()
             conn.close()
+
+def katalog_paket():
+    """Fungsi untuk menampilkan katalog paket."""
+    conn, cur = connect_to_db()
+    if conn is None or cur is None:
+        print("Gagal terhubung ke database. Silakan coba lagi nanti.")
+        return
+
+    try:
+        cur.execute("SELECT * FROM paket")
+        packages = cur.fetchall()
+        if not packages:
+            print("Tidak ada paket yang tersedia.")
+            return
+
+        print("\n=== Katalog Paket ===")
+        for package in packages:
+            print(f"ID: {package[0]}, Nama Paket: {package[1]}, Harga: {package[2]}")
+    except Exception as e:
+        print(f"Terjadi kesalahan saat mengambil data paket: {e}")
+    finally:
+        cur.close()
+        conn.close()
 
 def main():
     pass
