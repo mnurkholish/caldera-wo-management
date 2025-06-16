@@ -163,8 +163,7 @@ def katalog_paket():
         cur.close()
         conn.close()
 
-def edit_paket(id_paket, nama_baru=None, deskripsi_baru=None):
-    """Mengedit nama dan/atau deskripsi paket berdasarkan ID."""
+def edit_paket(id_paket, nama_baru=None, deskripsi_baru=None, harga_baru=None):
     conn, cur = connect_to_db()
     if conn is None or cur is None:
         return
@@ -173,24 +172,18 @@ def edit_paket(id_paket, nama_baru=None, deskripsi_baru=None):
         cur.execute("SELECT * FROM paket WHERE id_paket = %s", (id_paket,))
         paket = cur.fetchone()
         if not paket:
-            print("❌ Paket dengan ID tersebut tidak ditemukan.")
+            print("Paket dengan ID tersebut tidak ditemukan.")
             return
 
-        if nama_baru and deskripsi_baru:
-            cur.execute("UPDATE paket SET nama_paket = %s, deskripsi = %s WHERE id_paket = %s",
-                        (nama_baru, deskripsi_baru, id_paket))
-        elif nama_baru:
-            cur.execute("UPDATE paket SET nama_paket = %s WHERE id_paket = %s",
-                        (nama_baru, id_paket))
-        elif deskripsi_baru:
-            cur.execute("UPDATE paket SET deskripsi = %s WHERE id_paket = %s",
-                        (deskripsi_baru, id_paket))
-        else:
-            print("⚠️ Tidak ada perubahan yang dilakukan.")
-            return
+        if nama_baru:
+            cur.execute("UPDATE paket SET nama_paket = %s WHERE id_paket = %s", (nama_baru, id_paket))
+        if deskripsi_baru:
+            cur.execute("UPDATE paket SET deskripsi = %s WHERE id_paket = %s", (deskripsi_baru, id_paket))
+        if harga_baru is not None:
+            cur.execute("UPDATE paket SET harga = %s WHERE id_paket = %s", (harga_baru, id_paket))
 
         conn.commit()
-        print("✅ Data paket berhasil diperbarui.")
+        print("Data paket berhasil diperbarui.")
     except Exception as e:
         print("Terjadi kesalahan saat mengedit:", e)
     finally:
