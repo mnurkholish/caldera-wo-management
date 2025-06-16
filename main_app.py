@@ -142,7 +142,6 @@ def register():
             conn.close()
 
 def katalog_paket():
-    """Fungsi untuk menampilkan katalog paket."""
     conn, cur = connect_to_db()
     if conn is None or cur is None:
         print("Gagal terhubung ke database. Silakan coba lagi nanti.")
@@ -163,6 +162,41 @@ def katalog_paket():
     finally:
         cur.close()
         conn.close()
+
+def edit_paket(id_paket, nama_baru=None, deskripsi_baru=None):
+    """Mengedit nama dan/atau deskripsi paket berdasarkan ID."""
+    conn, cur = connect_to_db()
+    if conn is None or cur is None:
+        return
+
+    try:
+        cur.execute("SELECT * FROM paket WHERE id_paket = %s", (id_paket,))
+        paket = cur.fetchone()
+        if not paket:
+            print("❌ Paket dengan ID tersebut tidak ditemukan.")
+            return
+
+        if nama_baru and deskripsi_baru:
+            cur.execute("UPDATE paket SET nama_paket = %s, deskripsi = %s WHERE id_paket = %s",
+                        (nama_baru, deskripsi_baru, id_paket))
+        elif nama_baru:
+            cur.execute("UPDATE paket SET nama_paket = %s WHERE id_paket = %s",
+                        (nama_baru, id_paket))
+        elif deskripsi_baru:
+            cur.execute("UPDATE paket SET deskripsi = %s WHERE id_paket = %s",
+                        (deskripsi_baru, id_paket))
+        else:
+            print("⚠️ Tidak ada perubahan yang dilakukan.")
+            return
+
+        conn.commit()
+        print("✅ Data paket berhasil diperbarui.")
+    except Exception as e:
+        print("Terjadi kesalahan saat mengedit:", e)
+    finally:
+        cur.close()
+        conn.close()
+        print("🔌 Koneksi ditutup.")
 
 def main():
     pass
