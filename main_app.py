@@ -23,9 +23,9 @@ def connect_to_db():
         conn = psycopg2.connect(
             host="localhost",
             port="5432",
-            database="",
+            database="basdawo",
             user="postgres",
-            password=""
+            password="Kholish8306!"
         )
         cur = conn.cursor()
         return conn, cur
@@ -452,8 +452,10 @@ def lihat_riwayat_pesanan(user_id):
                             progress = cur.fetchone()
                             if progress:
                                 print(f"Progress Pesanan {id_pesanan} saat ini: {progress[0]}")
+                                input("Tekan Enter untuk lanjut...")
                             else:
                                 print("Pesanan tidak ditemukan.")
+                                input("Tekan Enter untuk lanjut...")
                         elif pilihan == '2':
                             id_pesanan = input("Masukkan ID Pesanan untuk melihat pembayaran: ").strip
                             if not id_pesanan.isdigit() or int(id_pesanan) not in [p[0] for p in pesanan_aktif]:
