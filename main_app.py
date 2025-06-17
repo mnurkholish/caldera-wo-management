@@ -348,7 +348,7 @@ def pesan_paket(user_id, paket_id, cur, conn):
         id_pesanan = cur.fetchone()[0]
         conn.commit()
         print(f"Pesanan dibuat dengan ID {id_pesanan}.")
-        input("Tekan Enter untuk lanjut...")
+        input("Tekan Enter untuk lanjut ke proses pembayaran...")
         return id_pesanan
     except Exception as e:
         print(f"Kesalahan saat buat pesanan: {e}")
@@ -466,6 +466,7 @@ def lihat_riwayat_pesanan(user_id):
                             input("Tekan Enter untuk lanjut...")
                         else:
                             print("Pilihan tidak valid.")
+                            input("Tekan Enter untuk lanjut...")
                     input("\nTekan Enter untuk kembali...")
 
             elif pilihan == '2':
@@ -485,7 +486,16 @@ def lihat_riwayat_pesanan(user_id):
                         headers=["ID Pesanan","ID Paket","ID Tempat","Pengantin Pria","Pengantin Wanita",
                                  "Tanggal","Jam Mulai","Jam Berakhir","Progress"]
                     print(tabulate(rows, headers=headers, tablefmt="fancy_grid"))
-                    input("\nTekan Enter untuk kembali...")
+
+                    lihat_pembayaran = input("\nApakah Anda ingin melihat detail pembayaran? (y/n): ").strip().lower()
+                    if lihat_pembayaran == 'y':
+                        id_pesanan = input("Masukkan ID Pesanan untuk melihat pembayaran: ").strip()
+                        if not id_pesanan.isdigit() or int(id_pesanan) not in [p[0] for p in pesanan_selesai]:
+                            print("ID pesanan tidak valid.")
+                            input("Tekan Enter untuk lanjut...")
+                            continue
+                        print_detail_pembayaran(id_pesanan)
+                        input("Tekan Enter untuk lanjut...")
             else:
                 print("Pilihan tidak valid.")
                 input("Tekan Enter untuk lanjut...")
