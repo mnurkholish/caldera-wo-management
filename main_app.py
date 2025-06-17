@@ -457,12 +457,13 @@ def lihat_riwayat_pesanan(user_id):
                                 print("Pesanan tidak ditemukan.")
                                 input("Tekan Enter untuk lanjut...")
                         elif pilihan == '2':
-                            id_pesanan = input("Masukkan ID Pesanan untuk melihat pembayaran: ").strip
+                            id_pesanan = input("Masukkan ID Pesanan untuk melihat pembayaran: ").strip()
                             if not id_pesanan.isdigit() or int(id_pesanan) not in [p[0] for p in pesanan_aktif]:
                                 print("ID pesanan tidak valid.")
                                 input("Tekan Enter untuk lanjut...")
                                 continue
-                            print_detail_pembayaran(id_pesanan, cur)
+                            print_detail_pembayaran(id_pesanan)
+                            input("Tekan Enter untuk lanjut...")
                         else:
                             print("Pilihan tidak valid.")
                     input("\nTekan Enter untuk kembali...")
@@ -495,8 +496,9 @@ def lihat_riwayat_pesanan(user_id):
         cur.close()
         conn.close()
 
-def print_detail_pembayaran(id_pesanan, cur):
+def print_detail_pembayaran(id_pesanan):
     """Fungsi untuk melihat detail pembayaran dari pesanan tertentu."""
+    conn, cur = connect_to_db()
     try:
         cur.execute("""
             SELECT p.id_pembayaran, p.id_metode_pembayaran, p.nama_pemilik_rekening, p.nominal, p.waktu_pembayaran, p.status_pembayaran
@@ -515,6 +517,7 @@ def print_detail_pembayaran(id_pesanan, cur):
         input("Tekan Enter untuk lanjut...")
     finally:
         cur.close()
+        conn.close()
 
 # Fitur Khusus Admin
 def konfirmasi_pembayaran():
@@ -635,7 +638,7 @@ def lihat_update_pesanan():
                     continue
 
                 id_pesanan = int(pilih)
-                print_detail_dan_pembayaran(id_pesanan, cur)
+                print_detail_dan_pembayaran(id_pesanan)
                 print("\nEnum progress yang sah:")
                 for idx, val in enumerate(progress_enum, start=1):
                     print(f"{idx}. {val}")
@@ -682,7 +685,7 @@ def lihat_update_pesanan():
                     continue
                 id_pesanan = int(pilih)
                 # Tampilkan detail dan info pembayaran, tanpa opsi update progress
-                print_detail_dan_pembayaran(id_pesanan, cur)
+                print_detail_dan_pembayaran(id_pesanan)
                 input("Tekan Enter untuk kembali...")
     except Exception as e:
         print(f"Kesalahan: {e}")
@@ -691,8 +694,9 @@ def lihat_update_pesanan():
         cur.close()
         conn.close()
 
-def print_detail_dan_pembayaran(id_pesanan, cur):
+def print_detail_dan_pembayaran(id_pesanan):
     """Tampilkan info lengkap pesanan dan pembayaran terkait (Admin)."""
+    conn, cur = connect_to_db()
     cur.execute("""
         SELECT id_pesanan, id_user, id_paket, id_tempat, nama_pengantin_pria, nama_pengantin_wanita,
                tanggal_acara, waktu_mulai, waktu_berakhir, jumlah_undangan, catatan_klien, progress
@@ -718,6 +722,9 @@ def print_detail_dan_pembayaran(id_pesanan, cur):
         print(tabulate(pembayaran, headers=["ID Pembayaran","ID Metode","Nama Rekening","Nominal","Waktu Pembayaran","Status"], tablefmt="fancy_grid"))
     else:
         print("\nBelum ada data pembayaran untuk pesanan ini.")
+
+    cur.close()
+    conn.close()
 
 def input_paket():
     """Fungsi untuk menambahkan paket baru ke database."""
@@ -899,6 +906,7 @@ def main():
                     katalog_paket(user_id)
                 elif pilihan == '3':
                     lihat_riwayat_pesanan(user_id)
+                    input("Tekan Enter untuk lanjut...")
                 elif pilihan == '4':
                     print("Terima kasih! Sampai jumpa.")
                     break
@@ -929,7 +937,7 @@ def main():
                 elif pilihan == '5':
                     delete_paket()
                 elif pilihan == '6':
-                    print("Fitur ini belum tersedia.")
+                    menu_edit_paket()
                     input("Tekan Enter untuk lanjut...")
                 elif pilihan == '7':
                     print("Terima kasih! Sampai jumpa.")
