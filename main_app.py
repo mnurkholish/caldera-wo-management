@@ -23,9 +23,9 @@ def connect_to_db():
         conn = psycopg2.connect(
             host="localhost",
             port="5432",
-            database="", # isi dengan nama database yang sesuai
+            database="basdawo", # isi dengan nama database yang sesuai
             user="postgres",
-            password="" # isi dengan password yang sesuai
+            password="Kholish8306!" # isi dengan password yang sesuai
         )
         cur = conn.cursor()
         return conn, cur
@@ -137,12 +137,12 @@ def register():
             cur.close()
             conn.close()
 
-def katalog_paket(user_id=None):
+def katalog_paket(user_id):
     """Fungsi untuk menampilkan katalog paket
        dan khusus untuk klien dapat memilih paket untuk dipesan."""
     conn, cur = connect_to_db()
     try:
-        cur.execute("SELECT id_paket, nama_paket, harga FROM paket ORDER BY id_paket")
+        cur.execute("SELECT id_paket, nama_paket, harga FROM paket WHERE tersedia = TRUE ORDER BY id_paket")
         packages = cur.fetchall()
         if not packages:
             print("Tidak ada paket yang tersedia.")
@@ -155,81 +155,50 @@ def katalog_paket(user_id=None):
         while True:
             header("Katalog Paket")
             print(tabulate(formatted_packages, headers=["ID", "Nama Paket", "Harga"], tablefmt="fancy_grid"))
-            if user_id:
-                print("\nMenu:")
-                print("1. Lihat Deskripsi Paket")
-                print("2. Pesan Paket")
-                print("0. Kembali")
-                pilihan = input("Pilih menu (0/1/2): ").strip()
-                if pilihan == '0':
-                    break
-                elif pilihan == '1':
-                    id_paket = input("Masukkan ID paket: ").strip()
-                    if not id_paket.isdigit():
-                        print("ID paket harus angka.")
-                        input("Tekan Enter untuk lanjut...")
-                        continue
-                    id_paket = int(id_paket)
-                    cur.execute("SELECT nama_paket, deskripsi, harga FROM paket WHERE id_paket = %s", (id_paket,))
-                    paket = cur.fetchone()
-                    if not paket:
-                        print("Paket tidak ditemukan.")
-                        input("Tekan Enter untuk lanjut...")
-                        continue
-                    harga_formatted = f"Rp{paket[2]:,}".replace(',', '.')
-                    header("Deskripsi Paket")
-                    print(f"Nama Paket: {paket[0]}")
-                    print(f"Harga: {harga_formatted}")
-                    print("Deskripsi:")
-                    print(paket[1])
-                    input("Tekan Enter untuk kembali...")
-                elif pilihan == '2':
-                    id_paket = input("Masukkan ID paket: ").strip()
-                    if not id_paket.isdigit():
-                        print("ID paket harus angka.")
-                        input("Tekan Enter untuk lanjut...")
-                        continue
-                    id_paket = int(id_paket)
-                    cur.execute("SELECT nama_paket, harga FROM paket WHERE id_paket = %s", (id_paket,))
-                    paket = cur.fetchone()
-                    if not paket:
-                        print("Paket tidak ditemukan.")
-                        input("Tekan Enter untuk lanjut...")
-                        continue
-                    harga_paket = paket[1]
-                    id_pesanan = pesan_paket(user_id, id_paket, cur, conn)
-                    if id_pesanan:
-                        proses_pembayaran(id_pesanan, harga_paket, cur, conn)
-            else:
-                print("\nMenu:")
-                print("1. Lihat Deskripsi Paket")
-                print("0. Kembali")
-                pilihan = input("Pilih menu (0/1): ").strip()
-                if pilihan == '0':
-                    break
-                elif pilihan == '1':
-                    id_paket = input("Masukkan ID paket: ").strip()
-                    if not id_paket.isdigit():
-                        print("ID paket harus angka.")
-                        input("Tekan Enter untuk lanjut...")
-                        continue
-                    id_paket = int(id_paket)
-                    cur.execute("SELECT nama_paket, deskripsi, harga FROM paket WHERE id_paket = %s", (id_paket,))
-                    paket = cur.fetchone()
-                    if not paket:
-                        print("Paket tidak ditemukan.")
-                        input("Tekan Enter untuk lanjut...")
-                        continue
-                    harga_formatted = f"Rp{paket[2]:,}".replace(',', '.')
-                    header("Deskripsi Paket")
-                    print(f"Nama Paket: {paket[0]}")
-                    print(f"Harga: {harga_formatted}")
-                    print("Deskripsi:")
-                    print(paket[1])
-                    input("Tekan Enter untuk kembali...")
-                else:
-                    print("Pilihan tidak valid.")
+            print("\nMenu:")
+            print("1. Lihat Deskripsi Paket")
+            print("2. Pesan Paket")
+            print("0. Kembali")
+            pilihan = input("Pilih menu (0/1/2): ").strip()
+            if pilihan == '0':
+                break
+            elif pilihan == '1':
+                id_paket = input("Masukkan ID paket: ").strip()
+                if not id_paket.isdigit():
+                    print("ID paket harus angka.")
                     input("Tekan Enter untuk lanjut...")
+                    continue
+                id_paket = int(id_paket)
+                cur.execute("SELECT nama_paket, deskripsi, harga FROM paket WHERE id_paket = %s", (id_paket,))
+                paket = cur.fetchone()
+                if not paket:
+                    print("Paket tidak ditemukan.")
+                    input("Tekan Enter untuk lanjut...")
+                    continue
+                harga_formatted = f"Rp{paket[2]:,}".replace(',', '.')
+                header("Deskripsi Paket")
+                print(f"Nama Paket: {paket[0]}")
+                print(f"Harga: {harga_formatted}")
+                print("Deskripsi:")
+                print(paket[1])
+                input("Tekan Enter untuk kembali...")
+            elif pilihan == '2':
+                id_paket = input("Masukkan ID paket: ").strip()
+                if not id_paket.isdigit():
+                    print("ID paket harus angka.")
+                    input("Tekan Enter untuk lanjut...")
+                    continue
+                id_paket = int(id_paket)
+                cur.execute("SELECT nama_paket, harga FROM paket WHERE id_paket = %s", (id_paket,))
+                paket = cur.fetchone()
+                if not paket:
+                    print("Paket tidak ditemukan.")
+                    input("Tekan Enter untuk lanjut...")
+                    continue
+                harga_paket = paket[1]
+                id_pesanan = pesan_paket(user_id, id_paket, cur, conn)
+                if id_pesanan:
+                    proses_pembayaran(id_pesanan, harga_paket, cur, conn)
     except Exception as e:
         print(f"Kesalahan mengambil paket: {e}")
     finally:
@@ -863,50 +832,78 @@ def edit_paket(id_paket, nama_baru=None, deskripsi_baru=None, harga_baru=None):
         cur.close()
         conn.close()
 
-def delete_paket():
-    """Fungsi untuk menghapus paket dari database."""
+def aktivasi_paket():
+    """Fungsi untuk mengaktifkan atau menonaktifkan paket."""
     conn, cur = connect_to_db()
+    try:
+        while True:
+            header("Aktivasi Paket")
+            print("1. Aktifkan Paket")
+            print("2. Nonaktifkan Paket")
+            print("0. Kembali")
+            pilihan = input("Pilih opsi (0/1/2): ").strip()
+            if pilihan == '0':
+                break
+            elif pilihan == '1':
+                cur.execute("SELECT id_paket, nama_paket, harga FROM paket WHERE tersedia = FALSE ORDER BY id_paket")
+                paket_tidak_aktif = cur.fetchall()
+                if not paket_tidak_aktif:
+                    print("Tidak ada paket yang dapat diaktifkan.")
+                    input("Tekan Enter untuk kembali...")
+                    continue
 
-    while True:
-        header("Hapus Paket")
+                formatted_paket = [(p[0], p[1], f"Rp{p[2]:,}".replace(',', '.')) for p in paket_tidak_aktif]
+                header("Paket Tidak Aktif")
+                print(tabulate(formatted_paket, headers=["ID Paket", "Nama Paket", "Harga"], tablefmt="fancy_grid"))
 
-        print("Daftar Paket:")
-        headers = ["ID Paket", "Nama Paket", "Harga"]
-        cur.execute("SELECT id_paket, nama_paket, harga FROM paket ORDER BY id_paket")
-        packages = cur.fetchall()
-        if not packages:
-            print("Tidak ada paket yang tersedia untuk dihapus.")
-            input("Tekan Enter untuk kembali...")
-            return
-        formatted_packages = [(pkg[0], pkg[1], f"Rp{pkg[2]:,}".replace(',', '.')) for pkg in packages]
-        print(tabulate(formatted_packages, headers=headers, tablefmt="fancy_grid"))
+                try:
+                    paket_id = int(input("Masukkan ID paket yang ingin diaktifkan: ").strip())
+                    if paket_id not in [p[0] for p in paket_tidak_aktif]:
+                        print("ID paket tidak valid.")
+                        input("Tekan Enter untuk lanjut...")
+                        continue
+                    cur.execute("UPDATE paket SET tersedia = TRUE WHERE id_paket = %s", (paket_id,))
+                    conn.commit()
+                    print(f"Paket dengan ID {paket_id} berhasil diaktifkan.")
+                    input("Tekan Enter untuk lanjut...")
+                except ValueError:
+                    print("ID paket harus berupa angka.")
+                    input("Tekan Enter untuk lanjut...")
 
-        try:
-            paket_id = int(input("Masukkan ID paket yang ingin dihapus: ").strip())
+            elif pilihan == '2':
+                cur.execute("SELECT id_paket, nama_paket, harga FROM paket WHERE tersedia = TRUE ORDER BY id_paket")
+                paket_aktif = cur.fetchall()
+                if not paket_aktif:
+                    print("Tidak ada paket yang dapat dinonaktifkan.")
+                    input("Tekan Enter untuk kembali...")
+                    continue
 
-            if paket_id not in [pkg[0] for pkg in packages]:
-                print("ID paket tidak valid. Silakan coba lagi.")
-                continue
+                formatted_paket = [(p[0], p[1], f"Rp{p[2]:,}".replace(',', '.')) for p in paket_aktif]
+                header("Paket Aktif")
+                print(tabulate(formatted_paket, headers=["ID Paket", "Nama Paket", "Harga"], tablefmt="fancy_grid"))
 
-        except ValueError:
-            print("ID paket harus berupa angka. Silakan coba lagi.")
-            retry = input("Apakah Anda ingin mencoba lagi? (y/n): ").strip().lower()
-            if retry == 'n':
-                print("Penghapusan paket dibatalkan.")
-                return
-            continue
-
-        cur.execute("DELETE FROM paket WHERE id_paket = %s;", (paket_id,))
-        conn.commit()
-        print(f"Paket dengan ID {paket_id} berhasil dihapus.")
-        retry = input("Apakah Anda ingin menghapus paket lain? (y/n): ").strip().lower()
-        if retry == 'n':
-            print("Penghapusan paket selesai.")
-            break
-
+                try:
+                    paket_id = int(input("Masukkan ID paket yang ingin dinonaktifkan: ").strip())
+                    if paket_id not in [p[0] for p in paket_aktif]:
+                        print("ID paket tidak valid.")
+                        input("Tekan Enter untuk lanjut...")
+                        continue
+                    cur.execute("UPDATE paket SET tersedia = FALSE WHERE id_paket = %s", (paket_id,))
+                    conn.commit()
+                    print(f"Paket dengan ID {paket_id} berhasil dinonaktifkan.")
+                    input("Tekan Enter untuk lanjut...")
+                except ValueError:
+                    print("ID paket harus berupa angka.")
+                    input("Tekan Enter untuk lanjut...")
+            else:
+                print("Pilihan tidak valid. Silakan coba lagi.")
+                input("Tekan Enter untuk lanjut...")
+    except Exception as e:
+        print(f"Kesalahan pada proses aktivasi paket: {e}")
+        input("Tekan Enter untuk lanjut...")
+    finally:
         cur.close()
         conn.close()
-        input("Tekan Enter untuk kembali...")
 
 def main():
     """Fungsi utama untuk menjalankan sistem."""
@@ -943,7 +940,7 @@ def main():
                 print("2. Konfirmasi Pembayaran")
                 print("3. Lihat dan Update Pesanan")
                 print("4. Input Paket Baru")
-                print("5. Hapus Paket")
+                print("5. Aktifkan/Nonaktifkan Paket")
                 print("6. Edit Paket")
                 print("7. Keluar")
                 pilihan = input("Pilih opsi: ").strip()
@@ -959,7 +956,7 @@ def main():
                 elif pilihan == '4':
                     input_paket()
                 elif pilihan == '5':
-                    delete_paket()
+                    aktivasi_paket()
                 elif pilihan == '6':
                     menu_edit_paket()
                     input("Tekan Enter untuk lanjut...")
