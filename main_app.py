@@ -23,9 +23,9 @@ def connect_to_db():
         conn = psycopg2.connect(
             host="localhost",
             port="5432",
-            database="basdawo",
+            database="",
             user="postgres",
-            password="Kholish8306!"
+            password=""
         )
         cur = conn.cursor()
         return conn, cur
@@ -72,16 +72,6 @@ def login():
         finally:
             cur.close()
             conn.close()
-
-        while True:
-            retry = input("Apakah Anda ingin mencoba lagi? (y/n): ").strip().lower()
-            if retry == 'y':
-                break
-            elif retry == 'n':
-                print("Keluar dari proses login.")
-                return None, None
-            else:
-                print("Input tidak valid. Ketik 'y' untuk mencoba lagi atau 'n' untuk keluar.")
 
 def register():
     """Fungsi untuk register (khusus klien)"""
@@ -364,8 +354,9 @@ def proses_pembayaran(id_pesanan, harga_paket, cur, conn):
             print("Metode pembayaran tidak tersedia.")
             input("Tekan Enter untuk lanjut...")
             return
+
         while True:
-            print(tabulate(daftar_metode, headers=["ID Metode","Nama Metode"], tablefmt="fancy_grid"))
+            print(tabulate(daftar_metode, headers=["ID Metode", "Nama Metode"], tablefmt="fancy_grid"))
             metode_input = input("Pilih ID metode pembayaran: ").strip()
             if not metode_input.isdigit():
                 print("Masukkan angka valid.")
@@ -385,12 +376,20 @@ def proses_pembayaran(id_pesanan, harga_paket, cur, conn):
 
         while True:
             nominal_input = input(f"Nominal pembayaran (harus sama dengan harga paket Rp{harga_paket:,}): ").replace(',', '').strip()
+            if nominal_input.lower() == 'kembali':
+                cur.execute("DELETE FROM pesanan WHERE id_pesanan = %s", (id_pesanan,))
+                conn.commit()
+                print("Pesanan telah dihapus.")
+                input("Tekan Enter untuk kembali...")
+                return
+
             if not nominal_input.isdigit():
                 print("Nominal harus angka.")
                 continue
+
             nominal = int(nominal_input)
             if nominal != harga_paket:
-                print("Nominal tidak sesuai.")
+                print("Nominal tidak sesuai. Ketik 'kembali' untuk membatalkan dan menghapus pesanan.")
                 continue
             break
 
@@ -403,6 +402,7 @@ def proses_pembayaran(id_pesanan, harga_paket, cur, conn):
     except Exception as e:
         print(f"Kesalahan proses pembayaran: {e}")
         input("Tekan Enter untuk lanjut...")
+
 
 def lihat_riwayat_pesanan(user_id):
     """Fungsi untuk melihat riwayat pesanan klien."""
@@ -800,7 +800,10 @@ def menu_edit_paket():
         try:
             id_paket = int(input("Masukkan ID paket yang ingin diedit: ").strip())
             if id_paket not in [pkg[0] for pkg in packages]:
-                print("ID paket tidak valid. Silakan coba lagi.")
+                retry = input("ID paket tidak valid. Apakah Anda ingin mencoba lagi? (y/n): ").strip().lower()
+                if retry != 'y':
+                    print("Pengeditan paket dibatalkan.")
+                    return
                 continue
         except ValueError:
             print("ID paket harus berupa angka. Silakan coba lagi.")
@@ -819,6 +822,12 @@ def menu_edit_paket():
         edit_paket(id_paket, nama_baru, deskripsi_baru, harga_baru)
 
         cur.close()
+
+        edit_lagi = input("Apakah Anda ingin mengedit paket lain? (y/n): ").strip().lower()
+        if edit_lagi != 'y':
+            print("Pengeditan paket selesai.")
+            break
+
 
 
 def edit_paket(id_paket, nama_baru=None, deskripsi_baru=None, harga_baru=None):
