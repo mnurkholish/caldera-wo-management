@@ -23,9 +23,9 @@ def connect_to_db():
         conn = psycopg2.connect(
             host="localhost",
             port="5432",
-            database="basdawo", # isi dengan nama database yang sesuai
+            database="", # isi dengan nama database yang sesuai
             user="postgres",
-            password="Kholish8306!" # isi dengan password yang sesuai
+            password="" # isi dengan password yang sesuai
         )
         cur = conn.cursor()
         return conn, cur
