@@ -10,11 +10,11 @@ from tabulate import tabulate
 def header(title=None):
     """Menampilkan header aplikasi."""
     os.system('cls' if os.name == 'nt' else 'clear')
-    print("=" * 33)
-    print("===== Caldera Party Planner =====")
+    print("=" * 39)
+    print("=====    Caldera Party Planner    =====")
     if title:
-        print(f"===== {title.center(21)} =====")
-    print("=" * 33)
+        print(f"===== {title.center(27)} =====")
+    print("=" * 39)
 
 
 def connect_to_db():
@@ -146,6 +146,7 @@ def katalog_paket(user_id=None):
         packages = cur.fetchall()
         if not packages:
             print("Tidak ada paket yang tersedia.")
+            input("Tekan Enter untuk kembali...")
             return
         formatted_packages = []
         for pkg in packages:
@@ -426,6 +427,7 @@ def lihat_riwayat_pesanan(user_id):
                 pesanan_aktif = cur.fetchall()
                 if not pesanan_aktif:
                     print("Tidak ada pesanan aktif.")
+                    input("Tekan Enter untuk lanjut...")
                 else:
                     print("\nPesanan Aktif:")
                     rows = []
@@ -478,6 +480,7 @@ def lihat_riwayat_pesanan(user_id):
                 pesanan_selesai = cur.fetchall()
                 if not pesanan_selesai:
                     print("Tidak ada pesanan selesai atau dibatalkan.")
+                    input("Tekan Enter untuk lanjut...")
                 else:
                     print("\nPesanan Selesai / Dibatalkan:")
                     rows = []
@@ -518,6 +521,7 @@ def print_detail_pembayaran(id_pesanan):
         pembayaran = cur.fetchall()
         if not pembayaran:
             print("Tidak ada data pembayaran untuk pesanan ini.")
+            input("Tekan Enter untuk kembali...")
             return
         print("\n=== Detail Pembayaran ===")
         headers = ["ID Pembayaran", "ID Metode", "Nama Rekening", "Nominal", "Waktu Pembayaran", "Status"]
@@ -656,6 +660,7 @@ def lihat_update_pesanan():
                     prog_choice = input("Masukkan nomor progress baru (0 batal): ").strip()
                     if prog_choice == '0':
                         print("Update dibatalkan.")
+                        input("Tekan Enter untuk kembali...")
                         break
                     if not prog_choice.isdigit() or not 1 <= int(prog_choice) <= len(progress_enum):
                         print("Pilihan tidak valid.")
